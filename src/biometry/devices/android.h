@@ -26,6 +26,8 @@
 #include <biometry/template_store.h>
 #include <biometry/verifier.h>
 
+#include <biometry/hardware/biometry.h>
+
 namespace biometry
 {
 namespace devices
@@ -76,6 +78,8 @@ private:
     TemplateStore template_store_;
     Identifier identifier_;
     Verifier verifier_;
+
+    UHardwareBiometry hybris_fp_instance;
 };
 }
 }
