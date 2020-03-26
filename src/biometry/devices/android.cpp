@@ -29,6 +29,11 @@ template<typename T>
 class androidOperation : public biometry::Operation<T>
 {
 public:
+    androidOperation(UHardwareBiometry hybris_fp_instance)
+     : hybris_fp_instance{hybris_fp_instance}
+    {
+    }
+
     void start_with_observer(const typename biometry::Operation<T>::Observer::Ptr& observer) override
     {
         observer->on_started();
@@ -38,49 +43,69 @@ public:
 
     void cancel() override
     {
-
+        u_hardware_biometry_cancel(hybris_fp_instance);
     }
+
+private:
+    UHardwareBiometry hybris_fp_instance;
 };
+}
+
+biometry::devices::android::TemplateStore::TemplateStore(UHardwareBiometry hybris_fp_instance)
+    : hybris_fp_instance{hybris_fp_instance}
+{
 }
 
 biometry::Operation<biometry::TemplateStore::SizeQuery>::Ptr biometry::devices::android::TemplateStore::size(const biometry::Application&, const biometry::User&)
 {
-    return std::make_shared<androidOperation<biometry::TemplateStore::SizeQuery>>();
+    return std::make_shared<androidOperation<biometry::TemplateStore::SizeQuery>>(hybris_fp_instance);
 }
 
 biometry::Operation<biometry::TemplateStore::List>::Ptr biometry::devices::android::TemplateStore::list(const biometry::Application&, const biometry::User&)
 {
-    return std::make_shared<androidOperation<biometry::TemplateStore::List>>();
+    return std::make_shared<androidOperation<biometry::TemplateStore::List>>(hybris_fp_instance);
 }
 
 biometry::Operation<biometry::TemplateStore::Enrollment>::Ptr biometry::devices::android::TemplateStore::enroll(const biometry::Application&, const biometry::User&)
 {
-    return std::make_shared<androidOperation<biometry::TemplateStore::Enrollment>>();
+    return std::make_shared<androidOperation<biometry::TemplateStore::Enrollment>>(hybris_fp_instance);
 }
 
 biometry::Operation<biometry::TemplateStore::Removal>::Ptr biometry::devices::android::TemplateStore::remove(const biometry::Application&, const biometry::User&, biometry::TemplateStore::TemplateId)
 {
-    return std::make_shared<androidOperation<biometry::TemplateStore::Removal>>();
+    return std::make_shared<androidOperation<biometry::TemplateStore::Removal>>(hybris_fp_instance);
 }
 
 biometry::Operation<biometry::TemplateStore::Clearance>::Ptr biometry::devices::android::TemplateStore::clear(const biometry::Application&, const biometry::User&)
 {
-    return std::make_shared<androidOperation<biometry::TemplateStore::Clearance>>();
+    return std::make_shared<androidOperation<biometry::TemplateStore::Clearance>>(hybris_fp_instance);
+}
+
+biometry::devices::android::Identifier::Identifier(UHardwareBiometry hybris_fp_instance)
+    : hybris_fp_instance{hybris_fp_instance}
+{
 }
 
 biometry::Operation<biometry::Identification>::Ptr biometry::devices::android::Identifier::identify_user(const biometry::Application&, const biometry::Reason&)
 {
-    return std::make_shared<androidOperation<biometry::Identification>>();
+    return std::make_shared<androidOperation<biometry::Identification>>(hybris_fp_instance);
+}
+
+biometry::devices::android::Verifier::Verifier(UHardwareBiometry hybris_fp_instance)
+    : hybris_fp_instance{hybris_fp_instance}
+{
 }
 
 biometry::Operation<biometry::Verification>::Ptr biometry::devices::android::Verifier::verify_user(const Application&, const User&, const Reason&)
 {
-    return std::make_shared<androidOperation<biometry::Verification>>();
+    return std::make_shared<androidOperation<biometry::Verification>>(hybris_fp_instance);
 }
 
-biometry::devices::android::android()
+biometry::devices::android::android(UHardwareBiometry hybris_fp_instance)
+    : template_store_{hybris_fp_instance},
+      identifier_{hybris_fp_instance},
+      verifier_{hybris_fp_instance}
 {
-    hybris_fp_instance = u_hardware_biometry_new();
 }
 
 biometry::TemplateStore& biometry::devices::android::template_store()
@@ -104,7 +129,7 @@ struct androidDescriptor : public biometry::Device::Descriptor
 {
     std::shared_ptr<biometry::Device> create(const biometry::util::Configuration&) override
     {
-        return std::make_shared<biometry::devices::android>();
+        return std::make_shared<biometry::devices::android>(u_hardware_biometry_new());
     }
 
     std::string name() const override
