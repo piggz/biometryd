@@ -178,6 +178,7 @@ biometry::Operation<biometry::TemplateStore::Removal>::Ptr biometry::devices::an
 
 biometry::Operation<biometry::TemplateStore::Clearance>::Ptr biometry::devices::android::TemplateStore::clear(const biometry::Application&, const biometry::User&)
 {
+    //TODO: enumerate + remove
     return std::make_shared<androidOperation<biometry::TemplateStore::Clearance>>(hybris_fp_instance);
 }
 
@@ -188,6 +189,7 @@ biometry::devices::android::Identifier::Identifier(UHardwareBiometry hybris_fp_i
 
 biometry::Operation<biometry::Identification>::Ptr biometry::devices::android::Identifier::identify_user(const biometry::Application&, const biometry::Reason&)
 {
+    //NOT SUPPORTED
     return std::make_shared<androidOperation<biometry::Identification>>(hybris_fp_instance);
 }
 
