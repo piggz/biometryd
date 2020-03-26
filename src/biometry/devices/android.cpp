@@ -144,17 +144,18 @@ private:
         printf("error_cb() called.\n");
     }
 };
-class androidAuthenticateOperation : public biometry::Operation<biometry::Verification>
+template<typename T>
+class androidAuthenticateOperation : public biometry::Operation<T>
 {
 public:
-    typename biometry::Operation<biometry::Verification>::Observer::Ptr mobserver;
+    typename biometry::Operation<T>::Observer::Ptr mobserver;
     
     androidAuthenticateOperation(UHardwareBiometry hybris_fp_instance)
      : hybris_fp_instance{hybris_fp_instance}
     {
     }
     
-    void start_with_observer(const typename biometry::Operation<biometry::Verification>::Observer::Ptr& observer) override
+    void start_with_observer(const typename biometry::Operation<T>::Observer::Ptr& observer) override
     {
         mobserver = observer;
         observer->on_started();
@@ -254,7 +255,7 @@ biometry::devices::android::Verifier::Verifier(UHardwareBiometry hybris_fp_insta
 biometry::Operation<biometry::Verification>::Ptr biometry::devices::android::Verifier::verify_user(const biometry::Application&, const biometry::User& user, const biometry::Reason&)
 {
     UHardwareBiometryRequestStatus ret = u_hardware_biometry_authenticate(hybris_fp_instance, 0, user.id);
-    return std::make_shared<androidAuthenticateOperation>(hybris_fp_instance);
+    return std::make_shared<androidAuthenticateOperation<biometry::Verification>>(hybris_fp_instance);
 }
 
 biometry::devices::android::android(UHardwareBiometry hybris_fp_instance)
