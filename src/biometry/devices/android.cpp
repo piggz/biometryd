@@ -110,7 +110,7 @@ biometry::Operation<biometry::TemplateStore::List>::Ptr biometry::devices::andro
 biometry::Operation<biometry::TemplateStore::Enrollment>::Ptr biometry::devices::android::TemplateStore::enroll(const biometry::Application&, const biometry::User& user)
 {
     uint64_t token = u_hardware_biometry_preEnroll(hybris_fp_instance);
-    UHardwareBiometryRequestStatus ret = u_hardware_biometry_enroll(hybris_fp_instance, new uint8_t[69], user->id, 1000);
+    UHardwareBiometryRequestStatus ret = u_hardware_biometry_enroll(hybris_fp_instance, new uint8_t[69], user.id, 1000);
     return std::make_shared<androidOperation<biometry::TemplateStore::Enrollment>>(hybris_fp_instance);
 }
 
