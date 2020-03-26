@@ -94,7 +94,6 @@ private:
             return;
 
         ((androidEnrollOperation*)context)->mobserver->on_failed(IntToStringFingerprintError(error, vendorCode));
-        printf("error_cb() called.\n");
     }
     
 };
@@ -151,7 +150,6 @@ private:
             return;
         
         ((androidRemovalOperation*)context)->mobserver->on_failed(IntToStringFingerprintError(error, vendorCode));
-        printf("error_cb() called.\n");
     }
 };
 template<typename T>
@@ -205,7 +203,6 @@ private:
             return;
         
         ((androidAuthenticateOperation*)context)->mobserver->on_failed(IntToStringFingerprintError(error, vendorCode));
-        printf("error_cb() called.\n");
     }
 };
 }
