@@ -29,6 +29,7 @@ template<typename T>
 class androidOperation : public biometry::Operation<T>
 {
 public:
+    typename biometry::Operation<T>::Observer::Ptr mobserver;
     androidOperation(UHardwareBiometry hybris_fp_instance)
      : hybris_fp_instance{hybris_fp_instance}
     {
@@ -36,9 +37,15 @@ public:
 
     void start_with_observer(const typename biometry::Operation<T>::Observer::Ptr& observer) override
     {
+        mobserver = observer;
         observer->on_started();
-        typename biometry::Operation<T>::Result result{};
-        observer->on_succeeded(result);
+        UHardwareBiometryParams fp_params;
+        
+        fp_params.enrollresult_cb = enrollresult_cb;
+        fp_params.error_cb = error_cb;
+       
+        fp_params.context = this;
+        u_hardware_biometry_setNotify(hybris_fp_instance, &fp_params);
     }
 
     void cancel() override
@@ -48,6 +55,12 @@ public:
 
 private:
     UHardwareBiometry hybris_fp_instance;
+    
+    static void enrollresult_cb(uint64_t deviceId, uint32_t fingerId, uint32_t groupId, uint32_t remaining, void *context)
+    {
+        ((androidOperation*)context)->mobserver->on_started();
+        printf("enrollresult_cb() called.\n");
+    }
 };
 }
 
