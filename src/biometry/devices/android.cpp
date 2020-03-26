@@ -45,6 +45,7 @@ class androidEnrollOperation : public biometry::Operation<biometry::TemplateStor
 {
 public:
     typename biometry::Operation<biometry::TemplateStore::Enrollment>::Observer::Ptr mobserver;
+    UHardwareBiometry hybris_fp_instance;
     int totalrem = 0;
     
     androidEnrollOperation(UHardwareBiometry hybris_fp_instance)
@@ -75,8 +76,6 @@ public:
     }
 
 private:
-    UHardwareBiometry hybris_fp_instance;
-
     static void acquired_cb(uint64_t, UHardwareBiometryFingerprintAcquiredInfo, int32_t, void *){}
     static void authenticated_cb(uint64_t, uint32_t, uint32_t, void *){}
     static void removed_cb(uint64_t, uint32_t, uint32_t, uint32_t, void *){}
@@ -91,6 +90,7 @@ private:
             float raw_value = remaining / ((androidEnrollOperation*)context)->totalrem;
             ((androidEnrollOperation*)context)->mobserver->on_progress(biometry::Progress{biometry::Percent::from_raw_value(raw_value), biometry::Dictionary{}});
         } else {
+            UHardwareBiometryRequestStatus ret = u_hardware_biometry_postEnroll(((androidEnrollOperation*)context)->hybris_fp_instance);
             ((androidEnrollOperation*)context)->mobserver->on_succeeded(fingerId);
         }
     }
