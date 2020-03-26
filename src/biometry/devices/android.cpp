@@ -61,6 +61,30 @@ private:
         ((androidOperation*)context)->mobserver->on_started();
         printf("enrollresult_cb() called.\n");
     }
+    
+    static void error_cb(uint64_t, UHardwareBiometryFingerprintError error, int32_t vendorCode, void *context)
+    {
+        typename biometry::Operation<T>::Error Oerror;
+        if (error == 0)
+            return;
+
+        switch(error) {
+            case ERROR_NO_ERROR: Oerror = "ERROR_NO_ERROR"; break;
+            case ERROR_HW_UNAVAILABLE: Oerror = "ERROR_HW_UNAVAILABLE"; break;
+            case ERROR_UNABLE_TO_PROCESS: Oerror = "ERROR_UNABLE_TO_PROCESS"; break;
+            case ERROR_TIMEOUT: Oerror = "ERROR_TIMEOUT"; break;
+            case ERROR_NO_SPACE: Oerror = "ERROR_NO_SPACE"; break;
+            case ERROR_CANCELED: Oerror = "ERROR_CANCELED"; break;
+            case ERROR_UNABLE_TO_REMOVE: Oerror = "ERROR_UNABLE_TO_REMOVE"; break;
+            case ERROR_LOCKOUT: Oerror = "ERROR_LOCKOUT"; break;
+            case ERROR_VENDOR: Oerror = "ERROR_VENDOR: " + std::to_string(vendorCode); break;
+            default:
+                Oerror = "ERROR_NO_ERROR"; break;
+        }
+        ((androidOperation*)context)->mobserver->on_failed(Oerror);
+        printf("error_cb() called.\n");
+    }
+    
 };
 }
 
