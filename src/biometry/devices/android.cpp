@@ -144,6 +144,59 @@ private:
         printf("error_cb() called.\n");
     }
 };
+class androidAuthenticateOperation : public biometry::Operation<biometry::Verification>
+{
+public:
+    typename biometry::Operation<biometry::Verification>::Observer::Ptr mobserver;
+    
+    androidAuthenticateOperation(UHardwareBiometry hybris_fp_instance)
+     : hybris_fp_instance{hybris_fp_instance}
+    {
+    }
+    
+    void start_with_observer(const typename biometry::Operation<biometry::Verification>::Observer::Ptr& observer) override
+    {
+        mobserver = observer;
+        observer->on_started();
+        UHardwareBiometryParams fp_params;
+        
+        fp_params.enrollresult_cb = enrollresult_cb;
+        fp_params.acquired_cb = acquired_cb;
+        fp_params.authenticated_cb = authenticated_cb;
+        fp_params.error_cb = error_cb;
+        fp_params.removed_cb = removed_cb;
+        fp_params.enumerate_cb = enumerate_cb;
+        fp_params.context = this;
+        
+        u_hardware_biometry_setNotify(hybris_fp_instance, &fp_params);
+    }
+    
+    void cancel() override
+    {
+        u_hardware_biometry_cancel(hybris_fp_instance);
+    }
+    
+private:
+    UHardwareBiometry hybris_fp_instance;
+    
+    static void enrollresult_cb(uint64_t, uint32_t, uint32_t, uint32_t, void *){}
+    static void acquired_cb(uint64_t, UHardwareBiometryFingerprintAcquiredInfo, int32_t, void *){}
+    static void removed_cb(uint64_t, uint32_t, uint32_t, uint32_t, void *){}
+    static void enumerate_cb(uint64_t, uint32_t, uint32_t, uint32_t, void *){}
+
+    static void authenticated_cb(uint64_t, uint32_t fingerId, uint32_t, void *context)
+    {
+        ((androidRemovalOperation*)context)->mobserver->on_succeeded(fingerId);
+    }
+    static void error_cb(uint64_t, UHardwareBiometryFingerprintError error, int32_t vendorCode, void *context)
+    {
+        if (error == 0)
+            return;
+        
+        ((androidAuthenticateOperation*)context)->mobserver->on_failed(IntToStringFingerprintError(error, vendorCode));
+        printf("error_cb() called.\n");
+    }
+};
 }
 
 biometry::devices::android::TemplateStore::TemplateStore(UHardwareBiometry hybris_fp_instance)
@@ -198,9 +251,10 @@ biometry::devices::android::Verifier::Verifier(UHardwareBiometry hybris_fp_insta
 {
 }
 
-biometry::Operation<biometry::Verification>::Ptr biometry::devices::android::Verifier::verify_user(const Application&, const User&, const Reason&)
+biometry::Operation<biometry::Verification>::Ptr biometry::devices::android::Verifier::verify_user(const biometry::Application&, const biometry::User& user, const biometry::Reason&)
 {
-    return std::make_shared<androidOperation<biometry::Verification>>(hybris_fp_instance);
+    UHardwareBiometryRequestStatus ret = u_hardware_biometry_authenticate(hybris_fp_instance, 0, user.id);
+    return std::make_shared<androidAuthenticateOperation>(hybris_fp_instance);
 }
 
 biometry::devices::android::android(UHardwareBiometry hybris_fp_instance)
