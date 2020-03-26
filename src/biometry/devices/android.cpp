@@ -75,7 +75,9 @@ private:
     static void enrollresult_cb(uint64_t deviceId, uint32_t fingerId, uint32_t groupId, uint32_t remaining, void *context)
     {
         ((androidOperation*)context)->mobserver->on_started();
-        printf("enrollresult_cb() called.\n");
+        
+        if (T == androidOperation<biometry::TemplateStore::Enrollment)
+            printf("enrollresult_cb() called.\n");
     }
     
     static void error_cb(uint64_t, UHardwareBiometryFingerprintError error, int32_t vendorCode, void *context)
