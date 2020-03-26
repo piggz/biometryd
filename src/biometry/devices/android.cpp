@@ -217,16 +217,16 @@ biometry::Operation<biometry::TemplateStore::List>::Ptr biometry::devices::andro
     return std::make_shared<androidOperation<biometry::TemplateStore::List>>(hybris_fp_instance);
 }
 
-biometry::Operation<biometry::TemplateStore::Enrollment>::Ptr biometry::devices::android::TemplateStore::enroll(const biometry::Application&, const biometry::User& user)
+biometry::Operation<biometry::TemplateStore::Enrollment>::Ptr biometry::devices::android::TemplateStore::enroll(const biometry::Application&, const biometry::User&)
 {
     uint64_t token = u_hardware_biometry_preEnroll(hybris_fp_instance);
-    UHardwareBiometryRequestStatus ret = u_hardware_biometry_enroll(hybris_fp_instance, new uint8_t[69], user.id, 1000);
+    UHardwareBiometryRequestStatus ret = u_hardware_biometry_enroll(hybris_fp_instance, new uint8_t[69], 0, 1000);
     return std::make_shared<androidOperation<biometry::TemplateStore::Enrollment>>(hybris_fp_instance);
 }
 
 biometry::Operation<biometry::TemplateStore::Removal>::Ptr biometry::devices::android::TemplateStore::remove(const biometry::Application&, const biometry::User& user, biometry::TemplateStore::TemplateId id)
 {
-    UHardwareBiometryRequestStatus ret = u_hardware_biometry_remove(hybris_fp_instance, user.id, id);
+    UHardwareBiometryRequestStatus ret = u_hardware_biometry_remove(hybris_fp_instance, 0, id);
     return std::make_shared<androidRemovalOperation>(hybris_fp_instance, id);
 }
 
@@ -243,8 +243,8 @@ biometry::devices::android::Identifier::Identifier(UHardwareBiometry hybris_fp_i
 
 biometry::Operation<biometry::Identification>::Ptr biometry::devices::android::Identifier::identify_user(const biometry::Application&, const biometry::Reason&)
 {
-    //NOT SUPPORTED
-    return std::make_shared<androidOperation<biometry::Identification>>(hybris_fp_instance);
+    UHardwareBiometryRequestStatus ret = u_hardware_biometry_authenticate(hybris_fp_instance, 0, 0);
+    return std::make_shared<androidAuthenticateOperation<biometry::Identification>>(hybris_fp_instance);
 }
 
 biometry::devices::android::Verifier::Verifier(UHardwareBiometry hybris_fp_instance)
@@ -252,9 +252,9 @@ biometry::devices::android::Verifier::Verifier(UHardwareBiometry hybris_fp_insta
 {
 }
 
-biometry::Operation<biometry::Verification>::Ptr biometry::devices::android::Verifier::verify_user(const biometry::Application&, const biometry::User& user, const biometry::Reason&)
+biometry::Operation<biometry::Verification>::Ptr biometry::devices::android::Verifier::verify_user(const biometry::Application&, const biometry::User&, const biometry::Reason&)
 {
-    UHardwareBiometryRequestStatus ret = u_hardware_biometry_authenticate(hybris_fp_instance, 0, user.id);
+    UHardwareBiometryRequestStatus ret = u_hardware_biometry_authenticate(hybris_fp_instance, 0, 0);
     return std::make_shared<androidAuthenticateOperation<biometry::Verification>>(hybris_fp_instance);
 }
 
