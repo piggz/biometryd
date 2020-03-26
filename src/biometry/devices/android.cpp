@@ -23,6 +23,22 @@
 
 #include <biometry/device_registry.h>
 
+std::string IntToStringFingerprintError(int error, int vendorCode){
+    switch(error) {
+        case ERROR_NO_ERROR: return "ERROR_NO_ERROR";
+        case ERROR_HW_UNAVAILABLE: return "ERROR_HW_UNAVAILABLE";
+        case ERROR_UNABLE_TO_PROCESS: return "ERROR_UNABLE_TO_PROCESS";
+        case ERROR_TIMEOUT: return "ERROR_TIMEOUT";
+        case ERROR_NO_SPACE: return "ERROR_NO_SPACE";
+        case ERROR_CANCELED: return "ERROR_CANCELED";
+        case ERROR_UNABLE_TO_REMOVE: return "ERROR_UNABLE_TO_REMOVE";
+        case ERROR_LOCKOUT: return "ERROR_LOCKOUT";
+        case ERROR_VENDOR: return "ERROR_VENDOR: " + std::to_string(vendorCode);
+        default:
+            return "ERROR_NO_ERROR";
+    }
+}
+
 namespace
 {
 template<typename T>
@@ -64,24 +80,10 @@ private:
     
     static void error_cb(uint64_t, UHardwareBiometryFingerprintError error, int32_t vendorCode, void *context)
     {
-        typename biometry::Operation<T>::Error Oerror;
         if (error == 0)
             return;
 
-        switch(error) {
-            case ERROR_NO_ERROR: Oerror = "ERROR_NO_ERROR"; break;
-            case ERROR_HW_UNAVAILABLE: Oerror = "ERROR_HW_UNAVAILABLE"; break;
-            case ERROR_UNABLE_TO_PROCESS: Oerror = "ERROR_UNABLE_TO_PROCESS"; break;
-            case ERROR_TIMEOUT: Oerror = "ERROR_TIMEOUT"; break;
-            case ERROR_NO_SPACE: Oerror = "ERROR_NO_SPACE"; break;
-            case ERROR_CANCELED: Oerror = "ERROR_CANCELED"; break;
-            case ERROR_UNABLE_TO_REMOVE: Oerror = "ERROR_UNABLE_TO_REMOVE"; break;
-            case ERROR_LOCKOUT: Oerror = "ERROR_LOCKOUT"; break;
-            case ERROR_VENDOR: Oerror = "ERROR_VENDOR: " + std::to_string(vendorCode); break;
-            default:
-                Oerror = "ERROR_NO_ERROR"; break;
-        }
-        ((androidOperation*)context)->mobserver->on_failed(Oerror);
+        ((androidOperation*)context)->mobserver->on_failed(IntToStringFingerprintError(error, vendorCode));
         printf("error_cb() called.\n");
     }
     
