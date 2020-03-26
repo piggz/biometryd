@@ -41,26 +41,31 @@ std::string IntToStringFingerprintError(int error, int vendorCode){
 
 namespace
 {
-template<typename T>
-class androidOperation : public biometry::Operation<T>
+class androidEnrollOperation : public biometry::Operation<biometry::TemplateStore::Enrollment>
 {
 public:
-    typename biometry::Operation<T>::Observer::Ptr mobserver;
-    androidOperation(UHardwareBiometry hybris_fp_instance)
+    typename biometry::Operation<biometry::TemplateStore::Enrollment>::Observer::Ptr mobserver;
+    int rem = 0;
+    
+    androidEnrollOperation(UHardwareBiometry hybris_fp_instance)
      : hybris_fp_instance{hybris_fp_instance}
     {
     }
 
-    void start_with_observer(const typename biometry::Operation<T>::Observer::Ptr& observer) override
+    void start_with_observer(const typename biometry::Operation<biometry::TemplateStore::Enrollment>::Observer::Ptr& observer) override
     {
         mobserver = observer;
         observer->on_started();
         UHardwareBiometryParams fp_params;
-        
+
         fp_params.enrollresult_cb = enrollresult_cb;
+        fp_params.acquired_cb = acquired_cb;
+        fp_params.authenticated_cb = authenticated_cb;
         fp_params.error_cb = error_cb;
-       
+        fp_params.removed_cb = removed_cb;
+        fp_params.enumerate_cb = enumerate_cb;
         fp_params.context = this;
+
         u_hardware_biometry_setNotify(hybris_fp_instance, &fp_params);
     }
 
@@ -71,10 +76,15 @@ public:
 
 private:
     UHardwareBiometry hybris_fp_instance;
-    
-    static void enrollresult_cb(uint64_t deviceId, uint32_t fingerId, uint32_t groupId, uint32_t remaining, void *context)
+
+    static void acquired_cb(uint64_t, UHardwareBiometryFingerprintAcquiredInfo, int32_t, void *){}
+    static void authenticated_cb(uint64_t, uint32_t, uint32_t, void *){}
+    static void removed_cb(uint64_t, uint32_t, uint32_t, uint32_t, void *){}
+    static void enumerate_cb(uint64_t, uint32_t, uint32_t, uint32_t, void *){}
+
+    static void enrollresult_cb(uint64_t, uint32_t fingerId, uint32_t, uint32_t remaining, void *context)
     {
-        ((androidOperation*)context)->mobserver->on_started();
+        ((androidEnrollOperation*)context)->mobserver->on_started();
         printf("enrollresult_cb() called.\n");
     }
     
@@ -83,7 +93,7 @@ private:
         if (error == 0)
             return;
 
-        ((androidOperation*)context)->mobserver->on_failed(IntToStringFingerprintError(error, vendorCode));
+        ((androidEnrollOperation*)context)->mobserver->on_failed(IntToStringFingerprintError(error, vendorCode));
         printf("error_cb() called.\n");
     }
     
@@ -221,7 +231,7 @@ biometry::Operation<biometry::TemplateStore::Enrollment>::Ptr biometry::devices:
 {
     uint64_t token = u_hardware_biometry_preEnroll(hybris_fp_instance);
     UHardwareBiometryRequestStatus ret = u_hardware_biometry_enroll(hybris_fp_instance, new uint8_t[69], 0, 1000);
-    return std::make_shared<androidOperation<biometry::TemplateStore::Enrollment>>(hybris_fp_instance);
+    return std::make_shared<androidEnrollOperation>(hybris_fp_instance);
 }
 
 biometry::Operation<biometry::TemplateStore::Removal>::Ptr biometry::devices::android::TemplateStore::remove(const biometry::Application&, const biometry::User& user, biometry::TemplateStore::TemplateId id)
