@@ -320,7 +320,7 @@ private:
     static void acquired_cb(uint64_t, UHardwareBiometryFingerprintAcquiredInfo, int32_t, void *){}
     static void authenticated_cb(uint64_t, uint32_t, uint32_t, void *){}
     static void removed_cb(uint64_t, uint32_t, uint32_t, uint32_t, void *){}
-    static void enumerate_cb(uint64_t, uint32_t fingerId, uint32_t, uint32_t remaining, void *context)
+    static void enumerate_cb(uint64_t, uint32_t, uint32_t, uint32_t remaining, void *context)
     {
         if (remaining > 0)
         {
@@ -439,7 +439,7 @@ biometry::Operation<biometry::TemplateStore::Enrollment>::Ptr biometry::devices:
     return std::make_shared<androidEnrollOperation>(hybris_fp_instance);
 }
 
-biometry::Operation<biometry::TemplateStore::Removal>::Ptr biometry::devices::android::TemplateStore::remove(const biometry::Application&, const biometry::User& user, biometry::TemplateStore::TemplateId id)
+biometry::Operation<biometry::TemplateStore::Removal>::Ptr biometry::devices::android::TemplateStore::remove(const biometry::Application&, const biometry::User&, biometry::TemplateStore::TemplateId id)
 {
     UHardwareBiometryRequestStatus ret = u_hardware_biometry_remove(hybris_fp_instance, 0, id);
     return std::make_shared<androidRemovalOperation>(hybris_fp_instance, id);
