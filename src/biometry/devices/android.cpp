@@ -278,6 +278,7 @@ biometry::devices::android::android(UHardwareBiometry hybris_fp_instance)
       identifier_{hybris_fp_instance},
       verifier_{hybris_fp_instance}
 {
+    //setActiveGroup
 }
 
 biometry::TemplateStore& biometry::devices::android::template_store()
