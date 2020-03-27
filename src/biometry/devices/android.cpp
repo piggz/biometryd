@@ -478,7 +478,7 @@ biometry::devices::android::android(UHardwareBiometry hybris_fp_instance)
       identifier_{hybris_fp_instance},
       verifier_{hybris_fp_instance}
 {
-    //setActiveGroup
+    UHardwareBiometryRequestStatus ret = u_hardware_biometry_setActiveGroup(hybris_fp_instance, 0, "/data/vendor_de/fpdata");
 }
 
 biometry::TemplateStore& biometry::devices::android::template_store()
