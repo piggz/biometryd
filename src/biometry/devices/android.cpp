@@ -280,6 +280,69 @@ private:
     }
     
 };
+class androidSizeOperation : public biometry::Operation<biometry::TemplateStore::SizeQuery>
+{
+public:
+    typename biometry::Operation<biometry::TemplateStore::SizeQuery>::Observer::Ptr mobserver;
+    int totalrem = 0;
+    
+    androidSizeOperation(UHardwareBiometry hybris_fp_instance)
+     : hybris_fp_instance{hybris_fp_instance}
+    {
+    }
+    
+    void start_with_observer(const typename biometry::Operation<biometry::TemplateStore::SizeQuery>::Observer::Ptr& observer) override
+    {
+        mobserver = observer;
+        observer->on_started();
+        UHardwareBiometryParams fp_params;
+        
+        fp_params.enrollresult_cb = enrollresult_cb;
+        fp_params.acquired_cb = acquired_cb;
+        fp_params.authenticated_cb = authenticated_cb;
+        fp_params.error_cb = error_cb;
+        fp_params.removed_cb = removed_cb;
+        fp_params.enumerate_cb = enumerate_cb;
+        fp_params.context = this;
+        
+        u_hardware_biometry_setNotify(hybris_fp_instance, &fp_params);
+    }
+    
+    void cancel() override
+    {
+        u_hardware_biometry_cancel(hybris_fp_instance);
+    }
+    
+private:
+    UHardwareBiometry hybris_fp_instance;
+    
+    static void enrollresult_cb(uint64_t, uint32_t, uint32_t, uint32_t, void *){}
+    static void acquired_cb(uint64_t, UHardwareBiometryFingerprintAcquiredInfo, int32_t, void *){}
+    static void authenticated_cb(uint64_t, uint32_t, uint32_t, void *){}
+    static void removed_cb(uint64_t, uint32_t, uint32_t, uint32_t, void *){}
+    static void enumerate_cb(uint64_t, uint32_t fingerId, uint32_t, uint32_t remaining, void *context)
+    {
+        if (remaining > 0)
+        {
+            if (((androidSizeOperation*)context)->totalrem == 0)
+                ((androidSizeOperation*)context)->totalrem = remaining + 1;
+            float raw_value = 1 - (remaining / ((androidSizeOperation*)context)->totalrem);
+            ((androidSizeOperation*)context)->mobserver->on_progress(biometry::Progress{biometry::Percent::from_raw_value(raw_value), biometry::Dictionary{}});
+        } else {
+            ((androidSizeOperation*)context)->mobserver->on_progress(biometry::Progress{biometry::Percent::from_raw_value(1), biometry::Dictionary{}});
+            ((androidSizeOperation*)context)->mobserver->on_succeeded(((androidSizeOperation*)context)->totalrem);
+        }
+    }
+    
+    static void error_cb(uint64_t, UHardwareBiometryFingerprintError error, int32_t vendorCode, void *context)
+    {
+        if (error == 0)
+            return;
+        
+        ((androidSizeOperation*)context)->mobserver->on_failed(IntToStringFingerprintError(error, vendorCode));
+    }
+    
+};
 }
 
 biometry::devices::android::TemplateStore::TemplateStore(UHardwareBiometry hybris_fp_instance)
@@ -289,8 +352,8 @@ biometry::devices::android::TemplateStore::TemplateStore(UHardwareBiometry hybri
 
 biometry::Operation<biometry::TemplateStore::SizeQuery>::Ptr biometry::devices::android::TemplateStore::size(const biometry::Application&, const biometry::User&)
 {
-    //TODO: enumerate and count remaining int
-    return std::make_shared<androidOperation<biometry::TemplateStore::SizeQuery>>(hybris_fp_instance);
+    UHardwareBiometryRequestStatus ret = u_hardware_biometry_enumerate(hybris_fp_instance);
+    return std::make_shared<androidSizeOperation>(hybris_fp_instance);
 }
 
 biometry::Operation<biometry::TemplateStore::List>::Ptr biometry::devices::android::TemplateStore::list(const biometry::Application&, const biometry::User&)
