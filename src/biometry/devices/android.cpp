@@ -90,6 +90,7 @@ private:
             float raw_value = 1 - (remaining / ((androidEnrollOperation*)context)->totalrem);
             ((androidEnrollOperation*)context)->mobserver->on_progress(biometry::Progress{biometry::Percent::from_raw_value(raw_value), biometry::Dictionary{}});
         } else {
+            ((androidEnrollOperation*)context)->mobserver->on_progress(biometry::Progress{biometry::Percent::from_raw_value(1), biometry::Dictionary{}});
             UHardwareBiometryRequestStatus ret = u_hardware_biometry_postEnroll(((androidEnrollOperation*)context)->hybris_fp_instance);
             ((androidEnrollOperation*)context)->mobserver->on_succeeded(fingerId);
         }
