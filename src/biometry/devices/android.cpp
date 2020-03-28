@@ -443,6 +443,12 @@ biometry::Operation<biometry::TemplateStore::Enrollment>::Ptr biometry::devices:
     authToken.authenticator_type = 16777216;
     authToken.timestamp = time(NULL);
     authToken.hmac[0] = 1;
+    printf("%s : hat->challange %lu",__func__,(unsigned long) authToken.challenge);
+    printf("%s : hat->user_id %lu",__func__,(unsigned long) authToken.user_id);
+    printf("%s : hat->authenticator_id %lu",__func__,(unsigned long) authToken.authenticator_id);
+    printf("%s : hat->authenticator_type %d",__func__, authToken.authenticator_type);
+    printf("%s : hat->timestamp %lu",__func__,(unsigned long) authToken.timestamp);
+    printf("%s : hat size %lu",__func__,(unsigned long) sizeof(hw_auth_token_t));
     UHardwareBiometryRequestStatus ret = u_hardware_biometry_enroll(hybris_fp_instance, reinterpret_cast<uint8_t*>(&authToken), 0, 1000);
     return std::make_shared<androidEnrollOperation>(hybris_fp_instance);
 }
