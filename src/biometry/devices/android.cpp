@@ -438,9 +438,9 @@ biometry::Operation<biometry::TemplateStore::Enrollment>::Ptr biometry::devices:
     hw_auth_token_t authToken;
     authToken.version = HW_AUTH_TOKEN_VERSION;
     authToken.challenge = u_hardware_biometry_preEnroll(hybris_fp_instance);
-    authToken.user_id = 0;
-    authToken.authenticator_id = u_hardware_biometry_getAuthenticatorId(hybris_fp_instance);
-    authToken.authenticator_type = HW_AUTH_FINGERPRINT;
+    authToken.user_id = 14591716404953218689;
+    authToken.authenticator_id = 0;
+    authToken.authenticator_type = 16777216;
     authToken.timestamp = time(NULL);
     authToken.hmac[0] = 1;
     UHardwareBiometryRequestStatus ret = u_hardware_biometry_enroll(hybris_fp_instance, reinterpret_cast<uint8_t*>(&authToken), 0, 1000);
