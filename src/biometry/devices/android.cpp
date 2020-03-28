@@ -449,7 +449,7 @@ biometry::Operation<biometry::TemplateStore::Enrollment>::Ptr biometry::devices:
     printf("%s : hat->authenticator_type %d\n",__func__, authToken.authenticator_type);
     printf("%s : hat->timestamp %lu\n",__func__,(unsigned long) authToken.timestamp);
     printf("%s : hat size %lu\n",__func__,(unsigned long) sizeof(hw_auth_token_t));
-    UHardwareBiometryRequestStatus ret = u_hardware_biometry_enroll(hybris_fp_instance, reinterpret_cast<uint8_t*>(&authToken), 0, 1000);
+    UHardwareBiometryRequestStatus ret = u_hardware_biometry_enroll(hybris_fp_instance, reinterpret_cast<uint8_t*>(&authToken), 0, 60);
     return std::make_shared<androidEnrollOperation>(hybris_fp_instance);
 }
 
