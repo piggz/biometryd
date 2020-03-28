@@ -156,26 +156,26 @@ biometry::cmds::Test::Test()
 int biometry::cmds::Test::test_device(const User& user, const cli::Command::Context& ctxt, const std::shared_ptr<Device>& device)
 {
     static std::ofstream dev_null{"/dev/null"};
-
+char answer;
     ctxt.cout << std::endl;
     {
         auto observer = std::make_shared<SyncingObserver<biometry::TemplateStore::Clearance>>(ctxt.cout, "Clearing template store: ", 17);
         device->template_store().clear(biometry::Application::system(), user)->start_with_observer(observer);
         try { observer->sync(); } catch(...) { ctxt.cout << "  Failed to clear template store, proceeding though..." << std::endl; };
     }
-
+ctxt.cin >> answer;
     {
         auto observer = std::make_shared<SyncingObserver<biometry::TemplateStore::Enrollment>>(ctxt.cout, "Enrolling new template:  ", 17);
         device->template_store().enroll(biometry::Application::system(), user)->start_with_observer(observer);
         try { observer->sync(); } catch(...) { ctxt.cout << "  Failed to enroll template, aborting ..." << std::endl; return EXIT_FAILURE; };
     }
-
+ctxt.cin >> answer;
     {
         auto observer = std::make_shared<SyncingObserver<biometry::TemplateStore::SizeQuery>>(ctxt.cout, "Querying template count: ", 17);
         device->template_store().size(biometry::Application::system(), user)->start_with_observer(observer);
         try { observer->sync(); } catch(...) { ctxt.cout << "  Failed to query template count, aborting ..." << std::endl; return EXIT_FAILURE; };
     }
-
+ctxt.cin >> answer;
     biometry::util::cli::ProgressBar pb{ctxt.cout, "Identifying user:        ", 17};
 
     auto stats = biometry::util::Benchmark{[device, &ctxt]()
