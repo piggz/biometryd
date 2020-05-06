@@ -7,7 +7,6 @@ Source: biometryd
 Priority: optional
 Maintainer: Ubuntu Developers <ubuntu-devel-discuss@lists.ubuntu.com>
 Build-Depends: cmake,
-               cmake-extras,
                debhelper (>= 9),
                doxygen,
                google-mock,
@@ -21,7 +20,6 @@ Build-Depends: cmake,
                libdbus-1-dev,
                libelf-dev,
                libgtest-dev,
-               libhybris-common-dev,
                libprocess-cpp-dev,
                libsqlite3-dev,
                lsb-release,
@@ -73,6 +71,7 @@ Section: devel
 Architecture: any
 Depends: libbiometryd1 (= ${binary:Version}),
          ${misc:Depends},
+         ${shlibs:Depends},
 Description: biometryd mediates/multiplexes to biometric devices - daemon/helper binaries
  biometryd mediates and multiplexes access to biometric devices present on the system,
  enabling applications and system components to leverage them for identification and verification
@@ -85,6 +84,7 @@ Section: devel
 Architecture: any
 Depends: libbiometryd1 (= ${binary:Version}),
          ${misc:Depends},
+         ${shlibs:Depends},
 Description: biometryd mediates/multiplexes to biometric devices - QML bindings
  biometryd mediates and multiplexes access to biometric devices present on the system,
  enabling applications and system components to leverage them for identification and verification
