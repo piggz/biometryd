@@ -27,10 +27,10 @@ QRectF biometry::qml::Converter::convert(const biometry::Rectangle& rect)
 {
     return QRectF
     {
-        rect.top_left.x,
-        rect.top_left.y,
-        rect.bottom_right.x - rect.top_left.x,
-        rect.bottom_right.y - rect.top_left.y
+        static_cast<qreal>(rect.top_left.x),
+        static_cast<qreal>(rect.top_left.y),
+        static_cast<qreal>(rect.bottom_right.x - rect.top_left.x),
+        static_cast<qreal>(rect.bottom_right.y - rect.top_left.y)
     };
 }
 
