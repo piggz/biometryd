@@ -29,9 +29,10 @@ if (NOT DEFINED BIOMETRYD_VERSION_MAJOR)
   endif()
 endif()
 
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Werror -Wall -pedantic -Wextra -fPIC -fvisibility=hidden -pthread")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -Werror -Wall -fno-strict-aliasing -fvisibility=hidden -fvisibility-inlines-hidden -pedantic -Wextra -fPIC -pthread")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -pedantic -Wextra -fPIC -fvisibility=hidden -pthread")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -Wall -fno-strict-aliasing -fvisibility=hidden -fvisibility-inlines-hidden -pedantic -Wextra -fPIC -pthread")
 set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,--no-undefined")
+add_definitions(-DBOOST_ASIO_NO_DEPRECATED=1)
 
 include(GNUInstallDirs)
 
@@ -50,7 +51,7 @@ find_package(Boost COMPONENTS filesystem program_options system REQUIRED)
 
 pkg_check_modules(DBUS_CPP dbus-cpp REQUIRED)
 pkg_check_modules(DBUS dbus-1 REQUIRED)
-pkg_check_modules(LIBAPPARMOR libapparmor REQUIRED)
+#pkg_check_modules(LIBAPPARMOR libapparmor REQUIRED)
 pkg_check_modules(PROCESS_CPP process-cpp REQUIRED)
 pkg_check_modules(SQLITE3 sqlite3 REQUIRED)
 
