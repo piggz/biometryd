@@ -35,11 +35,11 @@ add_library(
 qt5_use_modules(biometryd-qml Core Qml Quick)
 target_link_libraries(biometryd-qml biometry)
 
-add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/plugins.qmltypes
-    COMMAND qmlplugindump -notrelocatable Biometryd 0.0 ../ > ${CMAKE_CURRENT_BINARY_DIR}/plugins.qmltypes
-    DEPENDS biometryd-qml
-    WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
-)
+#add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/plugins.qmltypes
+#    COMMAND qmlplugindump -notrelocatable Biometryd 0.0 ../ > ${CMAKE_CURRENT_BINARY_DIR}/plugins.qmltypes
+#    DEPENDS biometryd-qml
+#    WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
+#)
 
 # We make the module available to qml tests without
 # requiring installation of the module. With that, we
@@ -60,6 +60,6 @@ add_custom_target(
     Content_generated_files ALL
     SOURCES ${CMAKE_CURRENT_BINARY_DIR}/plugins.qmltypes)
 
-install(
-    FILES ${CMAKE_CURRENT_BINARY_DIR}/plugins.qmltypes
-    DESTINATION ${PLUGIN_DIR})
+#install(
+#    FILES ${CMAKE_CURRENT_BINARY_DIR}/plugins.qmltypes
+#    DESTINATION ${PLUGIN_DIR})
