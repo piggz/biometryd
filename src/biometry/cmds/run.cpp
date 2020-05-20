@@ -17,6 +17,7 @@
  *
  */
 
+#include </usr/include/boost/version.hpp>
 #include <biometry/cmds/run.h>
 
 #include <biometry/device_registry.h>
@@ -119,6 +120,7 @@ biometry::cmds::Run::Run(const std::shared_ptr<biometry::util::PropertyStore>& p
             runtime->start();
         
             auto bus = this->bus_factory();
+
             bus->install_executor(core::dbus::asio::make_executor(bus, runtime->service()));
 
             auto impl = std::make_shared<biometry::DispatchingService>(

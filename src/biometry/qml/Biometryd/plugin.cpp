@@ -77,18 +77,19 @@ public:
 
     void dispatch(const std::function<void()>& f)
     {
-        service.post(f);
+        //service.post(f);
+        boost::asio::post(f);
     }
 
 private:
     Dispatcher()
-        : keep_alive{service},
+        : keep_alive(boost::asio::make_work_guard(service)),
           t{[this]() { service.run(); }}
     {
     }
 
-    boost::asio::io_service service;
-    boost::asio::io_service::work keep_alive;
+    boost::asio::io_context service;
+    boost::asio::executor_work_guard<boost::asio::io_context::executor_type> keep_alive;
     std::thread t;
 
 };

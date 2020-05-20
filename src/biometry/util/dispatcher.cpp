@@ -32,12 +32,13 @@ public:
 
     void dispatch(const Task &task) override
     {
-        strand.post(task);
+        //strand.post(task);
+        boost::asio::post(task);
     }
 
 private:
     std::shared_ptr<biometry::Runtime> rt;
-    boost::asio::io_service::strand strand;
+    boost::asio::io_context::strand strand;
 };
 }
 

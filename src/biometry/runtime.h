@@ -23,7 +23,6 @@
 #include <biometry/visibility.h>
 
 #include <boost/asio.hpp>
-
 #include <functional>
 #include <memory>
 #include <thread>
@@ -53,7 +52,7 @@ public:
     Runtime& operator=(const Runtime&) = delete;
     Runtime& operator=(Runtime&&) = delete;
 
-    // start executes the underlying io_service on a thread pool with
+    // start executes the underlying io_context on a thread pool with
     // the size configured at creation time.
     void start();
 
@@ -65,9 +64,9 @@ public:
     // with components that expect a dispatcher for operation.
     std::function<void(std::function<void()>)> to_dispatcher_functional();
 
-    // service returns the underlying boost::asio::io_service that is executed
+    // service returns the underlying boost::asio::io_context that is executed
     // by the Runtime.
-    boost::asio::io_service& service();
+    boost::asio::io_context& service();
 
 private:
     // Runtime constructs a new instance, firing up pool_size
@@ -75,9 +74,9 @@ private:
     Runtime(std::uint32_t pool_size);
 
     std::uint32_t pool_size_;
-    boost::asio::io_service service_;
-    boost::asio::io_service::strand strand_;
-    boost::asio::io_service::work keep_alive_;
+    boost::asio::io_context service_;
+    boost::asio::io_context::strand strand_;
+    boost::asio::executor_work_guard<boost::asio::io_context::executor_type> keep_alive_;
     std::vector<std::thread> workers_;
 };
 }
