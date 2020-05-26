@@ -21,6 +21,9 @@ BuildRequires:  boost-system
 BuildRequires:  boost-devel
 BuildRequires:  libhybris-devel
 BuildRequires:  elfutils-libelf-devel
+BuildRequires:  pkgconfig(Qt5Core)
+BuildRequires:  pkgconfig(Qt5Qml)
+BuildRequires:  pkgconfig(Qt5Quick)
 Requires:       pkgconfig
 Requires:       libdbus-cpp5
 
