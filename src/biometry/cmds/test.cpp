@@ -38,6 +38,7 @@
 #include <iomanip>
 #include <future>
 #include <stdexcept>
+#include <iostream>
 
 namespace cli = biometry::util::cli;
 
@@ -53,13 +54,13 @@ public:
         : pb{out, name, width},
           future{promise.get_future()}
     {
-      ctxt.cout << "SyncingObserver constructed" << std::endl;
+      std::cout << "SyncingObserver constructed" << std::endl;
     }
 
     typename Super::Result sync()
     {
       if (!future.valid()) 
-        ctxt.cout << "future invalid" << std::endl;
+        std::cout << "future invalid" << std::endl;
       return future.get();
     }
 
