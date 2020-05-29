@@ -53,11 +53,14 @@ public:
         : pb{out, name, width},
           future{promise.get_future()}
     {
+      ctxt.cout << "SyncingObserver constructed" << std::endl;
     }
 
     typename Super::Result sync()
     {
-        return future.get();
+      if (!future.valid()) 
+        ctxt.cout << "future invalid" << std::endl;
+      return future.get();
     }
 
     // From biometry::Operation<T>::Observer
@@ -89,7 +92,7 @@ public:
 private:
     biometry::util::cli::ProgressBar pb;
     std::promise<typename Super::Result> promise;
-    std::future<typename Super::Result> future{promise.get_future()};
+    std::future<typename Super::Result> future; //{promise.get_future()};
 };
 
 std::shared_ptr<biometry::Device> device_from_config_file(const boost::filesystem::path& file)
@@ -159,8 +162,11 @@ int biometry::cmds::Test::test_device(const User& user, const cli::Command::Cont
 
     ctxt.cout << std::endl;
     {
+        ctxt.cout << "STP0" << std::endl;
         auto observer = std::make_shared<SyncingObserver<biometry::TemplateStore::Clearance>>(ctxt.cout, "Clearing template store: ", 17);
+        ctxt.cout << "STP1" << std::endl;
         device->template_store().clear(biometry::Application::system(), user)->start_with_observer(observer);
+        ctxt.cout << "STP2" << std::endl;
         try { observer->sync(); }
         catch(std::exception& e) {
           ctxt.cout << "\n  Exception: " << e.what() << std::endl;
@@ -169,8 +175,11 @@ int biometry::cmds::Test::test_device(const User& user, const cli::Command::Cont
     }
 
     {
+        ctxt.cout << "STP3" << std::endl;
         auto observer = std::make_shared<SyncingObserver<biometry::TemplateStore::Enrollment>>(ctxt.cout, "Enrolling new template:  ", 17);
+        ctxt.cout << "STP4" << std::endl;
         device->template_store().enroll(biometry::Application::system(), user)->start_with_observer(observer);
+        ctxt.cout << "STP5" << std::endl;
         try { observer->sync(); }
         catch(std::exception& e) {
           ctxt.cout << "\n  Exception: " << e.what() << std::endl;
