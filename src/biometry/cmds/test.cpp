@@ -161,19 +161,19 @@ int biometry::cmds::Test::test_device(const User& user, const cli::Command::Cont
 {
     static std::ofstream dev_null{"/dev/null"};
 
-    ctxt.cout << std::endl;
-    {
-        ctxt.cout << "STP0" << std::endl;
-        auto observer = std::make_shared<SyncingObserver<biometry::TemplateStore::Clearance>>(ctxt.cout, "Clearing template store: ", 17);
-        ctxt.cout << "STP1" << std::endl;
-        device->template_store().clear(biometry::Application::system(), user)->start_with_observer(observer);
-        ctxt.cout << "STP2" << std::endl;
-        try { observer->sync(); }
-        catch(std::exception& e) {
-          ctxt.cout << "\n  Exception: " << e.what() << std::endl;
-          ctxt.cout << "  Failed to clear template store, proceeding though... " << std::endl;
-        };
-    }
+    // ctxt.cout << std::endl;
+    // {
+    //     ctxt.cout << "STP0" << std::endl;
+    //     auto observer = std::make_shared<SyncingObserver<biometry::TemplateStore::Clearance>>(ctxt.cout, "Clearing template store: ", 17);
+    //     ctxt.cout << "STP1" << std::endl;
+    //     device->template_store().clear(biometry::Application::system(), user)->start_with_observer(observer);
+    //     ctxt.cout << "STP2" << std::endl;
+    //     try { observer->sync(); }
+    //     catch(std::exception& e) {
+    //       ctxt.cout << "\n  Exception: " << e.what() << std::endl;
+    //       ctxt.cout << "  Failed to clear template store, proceeding though... " << std::endl;
+    //     };
+    // }
 
     {
         ctxt.cout << "STP3" << std::endl;
